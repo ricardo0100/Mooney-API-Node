@@ -1,29 +1,29 @@
+//node_modules
 var express = require('express');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
+
+
+//modules
 var authentication = require('./middlewares/authentication');
-var mongoose = require('mongoose');
 var Profile = require('./model/profile');
+var db = require('./middlewares/database');
 
 var app = express();
-
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(authentication.initialize());
 
-var dbUri = process.env.MONGODB_URI || 'mongodb://localhost/mooney';
-mongoose.connect(dbUri);
 
-var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  Profile.findByUsername('ricardo').exec(function(err, profile) {
+db.once('open', function(err, profile) {
+  Profile.findByUsername('ricardo', function() {
     if (!profile) {
       var newProfile = new Profile({
           name: 'Ricardo',
           username:'ricardo',
-          password:'96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e'
+          password:'e96ac6b2cda967f55a627f202986d5d12865b93d59cfaf1fe6f91b0bae623a81'
         }).save();
     }
   });

@@ -10,4 +10,6 @@ profileSchema.statics.findByUsername = function(username, callback) {
   return this.findOne({ username: username }, callback);
 };
 
-module.exports = mongoose.model('Profile', profileSchema);
+var model = mongoose.model('Profile', profileSchema);
+
+module.exports = model;
