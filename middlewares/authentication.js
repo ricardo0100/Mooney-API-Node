@@ -7,7 +7,7 @@ var auth = function() {
 
   passport.use(new BasicStrategy(
     function(username, password, done) {
-      Profile.findByUsername(username, function(err, profile){
+      Profile.findOne({ username: username }, function(err, profile) {
         if (err) { return done(err); }
         if (!profile) { return done(null, false); }
         if (profile.password === sha256(password)) {

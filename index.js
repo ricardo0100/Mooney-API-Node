@@ -3,7 +3,6 @@ var express = require('express');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 
-
 //modules
 var authentication = require('./middlewares/authentication');
 var Profile = require('./model/profile');
@@ -15,10 +14,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(authentication.initialize());
 
-
+//Start database
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function(err, profile) {
-  Profile.findByUsername('ricardo', function() {
+  //Routes
+  var api = require('./routes/api');
+  app.use('/api', authentication.authenticate('basic', { session: false }), api);
+
+  //Start server
+  var port = process.env.PORT || 3000;
+  app.listen(port, function () {
+    console.log('Mooney listening on port ' + port);
+  });
+
+  //default user
+  Profile.find({ username: 'ricardo' }, function(err, profile) {
     if (!profile) {
       var newProfile = new Profile({
           name: 'Ricardo',
@@ -27,13 +37,4 @@ db.once('open', function(err, profile) {
         }).save();
     }
   });
-});
-
-var apiRoute = require('./routes/api');
-app.use('/api', authentication.authenticate('basic', { session: false }), apiRoute);
-
-var port = process.env.PORT || 3000;
-
-app.listen(port, function () {
-  console.log('Example app listening on port ' + port);
 });

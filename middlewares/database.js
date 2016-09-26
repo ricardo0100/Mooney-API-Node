@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.promise = null;
+mongoose.Promise = require('bluebird');
 
 var dbUri = process.env.MONGODB_URI || 'mongodb://localhost/mooney';
 mongoose.connect(dbUri);
