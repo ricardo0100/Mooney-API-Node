@@ -12,6 +12,7 @@
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "handlebars": "^4.0.5",
     "js-sha256": "^0.3.2",
     "mongoose": "^4.6.1",
     "morgan": "^1.7.0",

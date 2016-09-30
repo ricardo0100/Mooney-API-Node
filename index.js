@@ -1,11 +1,8 @@
-//node_modules
 var express = require('express');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 
-//modules
 var authentication = require('./middlewares/authentication');
-var Profile = require('./model/profile');
 var db = require('./middlewares/database');
 
 var app = express();
@@ -14,12 +11,32 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(authentication.initialize());
 
+var handlebars = require('handlebars');
+var fs = require('fs');
+app.engine('handlebars', function (filePath, context, callback) {
+  fs.readFile(filePath, function (err, content) {
+    if (err) return callback(new Error(err));
+    var template = handlebars.compile(content.toString());
+    var rendered = template(context);
+    return callback(null, rendered);
+  });
+});
+app.set('views', __dirname + '/views');
+app.set('view engine', 'handlebars');
+
+var Profile = require('./model/profile');
+
 //Start database
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function(err, profile) {
-  //Routes
-  var api = require('./routes/api');
+  
+  //API
+  var api = require('./routes/api/api');
   app.use('/api', authentication.authenticate('basic', { session: false }), api);
+
+  //Site
+  var site = require('./routes/site/home');
+  app.use('/', site);
 
   //Start server
   var port = process.env.PORT || 3000;

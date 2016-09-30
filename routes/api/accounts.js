@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var Account = require('../model/account');
+var Account = require('../../model/account');
 
 router.get('/accounts', function(request, response, next) {
   Account.find({}).exec()
