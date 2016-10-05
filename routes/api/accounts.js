@@ -4,12 +4,15 @@ var async = require('async')
 var Account = require('../../model/account');
 
 router.get('/accounts', function(request, response, next) {
-  Account.find({ removed: false }).exec()
-  .then(function(accounts) {
-    response.json(accounts);
-  })
-  .then(function(error) {
-    next(error);
+  Account.findAllForUser(request.user, function(err, accounts) {
+    if(err) {
+      response.status(500);
+      response.send(err);
+    } else {
+      response.status(200);
+      response.send(accounts);
+    }
+    next();
   });
 });
 
@@ -19,7 +22,7 @@ router.post('/accounts', function(request, response, next) {
   var errors = [];
   
   async.each(request.body, function iteratee(account, callback) {
-
+    account.profile = request.user;
     var newAccount = new Account(account);
     var validationError = newAccount.validateSync();
     if(validationError) {

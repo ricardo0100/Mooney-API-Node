@@ -1,16 +1,7 @@
 var mongoose = require('mongoose');
+var baseSchema = require('../model/baseSchema');
 
-var accountSchema = mongoose.Schema({
-  _id: { type: String, required: true },
-  name: { type: String, required: true },
-  removed: { type: Boolean, default: false }
-}, { useNestedStrict: true, timestamps: { createdAt: 'created_at', updatedAt:  'updated_at' } });
-
-accountSchema.pre('findOneAndUpdate', function(next) {
-  
-  next();
-});
-
+var accountSchema = baseSchema.createSchema({ name: { type: String } });
 var model = mongoose.model('Account', accountSchema);
 
 module.exports = model;
