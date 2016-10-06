@@ -15,7 +15,7 @@ var createSchema = function(fields) {
   var schema = mongoose.Schema(schemaFields, { useNestedStrict: true, timestamps: { createdAt: 'created_at', updatedAt:  'updated_at' } });
   
   schema.statics.findAllForUser = function(user, callback) {
-    this.find({ removed: false, profile: user }).exec()
+    this.find({ profile: user }).exec()
     .then(function(accounts) {
       callback(null, accounts);
     })
@@ -24,6 +24,28 @@ var createSchema = function(fields) {
         callback(error, null);
       }
     });
+  };
+
+  schema.statics.upsert = function(object, callback) {
+    var newObject = new this(object);
+    var validationError = newObject.validateSync();
+    if(validationError) {
+      callback(validationError, null);
+    } else {
+      this.findOneAndUpdate({ _id: newObject._id }, newObject, { upsert: true })
+      .then(function(document) {
+        if (document) {
+          callback(null, true);
+        } else {
+          callback(null, false);
+        }
+      })
+      .then(function(err) {
+        if(err) {
+          callback(err, null);
+        }
+      });
+    }
   };
   
   return schema;
