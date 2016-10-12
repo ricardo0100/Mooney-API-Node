@@ -1,31 +1,58 @@
 var express = require('express');
 var router = express.Router();
-
+var async = require('async')
 var Category = require('../../model/category');
 
 router.get('/categories', function(request, response, next) {
-  Category.find({}).exec()
-  .then(function(category) {
-    response.json(category);
-  })
-  .then(function(error) {
-    next(error);
+  Category.findAllForUser(request.user, function(err, accounts) {
+    if(err) {
+      response.status(500);
+      response.send(err);
+    } else {
+      response.status(200);
+      response.send(accounts);
+    }
+    next();
   });
 });
 
 router.post('/categories', function(request, response, next) {
-  for (var index in request.body) {
-    var category = request.body[index];
-    Category.update({ uuid: category.uuid }, category, { upsert: true }).exec()
-    .then(function(raw) {
-      response.status(200);
-      response.send(raw);
-    })
-    .then(function(error) {
-      response.status(400);
-      next(error);
+  var inserts = [];
+  var updates = [];
+  var errors = [];
+  
+  async.each(request.body, function iteratee(account, callback) {
+    
+    account.profile = request.user;
+    Category.upsert(account, function(err, isUpdate) {
+      if (err) {
+        errors.push({ key: account._id, value: err });
+      } else if (isUpdate) {
+        updates.push(account._id);
+      } else {
+        inserts.push(account._id);
+      }
+      callback();
     });
-  }
+
+  }, function(err) {
+
+    if(err) {
+      response.status(400);
+      response.send(err);
+      next(err);
+    } else {
+      response.status(200);
+      response.send({
+        inserted: inserts,
+        updated: updates,
+        errors: errors
+      });
+      next();
+    }
+
+  });
+
 });
 
 module.exports = router;

@@ -1,9 +1,9 @@
 var mongoose = require('mongoose');
+var baseSchema = require('../model/baseSchema');
 
-var categorySchema = mongoose.Schema({
-  _id: { type: String },
-  removed: { type: Boolean, default: false }
-}, { useNestedStrict: true, timestamps: true });
+var categorySchema = baseSchema.createSchema({ 
+    name: { type: String }
+});
 
 var model = mongoose.model('Category', categorySchema);
 

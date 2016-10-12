@@ -1,22 +1,22 @@
 var express = require('express');
 var router = express.Router();
 var async = require('async')
-var Account = require('../../model/account');
+var Transaction = require('../../model/transaction');
 
-router.get('/accounts', function(request, response, next) {
-  Account.findAllForUser(request.user, function(err, accounts) {
+router.get('/transactions', function(request, response, next) {
+  Transaction.findAllForUser(request.user, function(err, transactions) {
     if(err) {
       response.status(500);
       response.send(err);
     } else {
       response.status(200);
-      response.send(accounts);
+      response.send(transactions);
     }
     next();
   });
 });
 
-router.post('/accounts', function(request, response, next) {
+router.post('/transactions', function(request, response, next) {
   var inserts = [];
   var updates = [];
   var errors = [];
@@ -24,7 +24,7 @@ router.post('/accounts', function(request, response, next) {
   async.each(request.body, function iteratee(account, callback) {
     
     account.profile = request.user;
-    Account.upsert(account, function(err, isUpdate) {
+    Transaction.upsert(account, function(err, isUpdate) {
       if (err) {
         errors.push({ key: account._id, value: err });
       } else if (isUpdate) {

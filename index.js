@@ -46,7 +46,8 @@ db.once('open', function(err, profile) {
 
   //default user
   Profile.find({ username: 'ricardo' }, function(err, profile) {
-    if (!profile) {
+    if (!profile.length) {
+      console.log('Created Ricardo');
       var newProfile = new Profile({
           name: 'Ricardo',
           username:'ricardo',

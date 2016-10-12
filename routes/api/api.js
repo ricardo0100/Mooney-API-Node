@@ -7,7 +7,9 @@ router.get('/', function(req, res, next) {
 
 var accountsRoute = require('../api/accounts');
 var categoriesRoute = require('../api/categories');
+var transactionsRoute = require('../api/transactions');
 router.all('/accounts', accountsRoute);
 router.all('/categories', categoriesRoute);
+router.all('/transactions', transactionsRoute);
 
 module.exports = router;

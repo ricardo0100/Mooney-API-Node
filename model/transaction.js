@@ -1,14 +1,14 @@
 var mongoose = require('mongoose');
+var baseSchema = require('../model/baseSchema');
 
-var transactionSchema = mongoose.Schema({
-  _id: { type: String },
+var transactionSchema = baseSchema.createSchema({
   name: { type: String },
-  removed: { type: Boolean, default: false },
   value: { type: Number },
-  category: { type: Schema.Types.ObjectId, ref: 'Category' },
-  account: { type: Schema.Types.ObjectId, ref: 'Account' }
+  type: { type: String },
+  category_id: { type: String, required: true },
+  account_id: { type: String, required: true }
 }, { useNestedStrict: true, timestamps: true });
 
-var model = mongoose.model('Category', categorySchema);
+var model = mongoose.model('Transaction', transactionSchema);
 
 module.exports = model;
